@@ -1,3 +1,33 @@
+import streamlit as st
+import streamlit.components.v1 as components
+
+# ==========================================
+# 1. Configuración de la página
+# ==========================================
+st.set_page_config(page_title="Laboratorio de Física", page_icon="⚛️", layout="wide")
+
+# ==========================================
+# 2. Menú de Navegación Lateral
+# ==========================================
+st.sidebar.title("🎛️ Panel de Control")
+st.sidebar.markdown("Seleccione el entorno virtual a ejecutar:")
+
+modulo_elegido = st.sidebar.radio(
+    "Módulos disponibles:",
+    [
+        "⚡ Campo Electromagnético",
+        "🌊 Tubo de Kundt (Ondas)",
+        "☀️ Efecto Fotoeléctrico",
+        "⚙️ Próximamente..."
+    ]
+)
+
+# ==========================================
+# 3. Lógica de renderizado principal
+# ==========================================
+st.title(f"Laboratorio Virtual: {modulo_elegido}")
+st.markdown("---")
+
 # --- SIMULACIÓN 1 ---
 if modulo_elegido == "⚡ Campo Electromagnético":
     st.write("Mueva el control deslizante para desplazar la carga $+q$ en el interior del cascarón. Observe cómo las líneas de campo exterior (en cyan) permanecen invariantes debido al apantallamiento electrostático, independientemente de la distribución asimétrica de la carga inducida en la pared interna.")
@@ -63,7 +93,6 @@ if modulo_elegido == "⚡ Campo Electromagnético":
                     let endY = cy + R * Math.sin(ang);
                     
                     // Cálculo dinámico del punto de control para forzar incidencia normal (90 grados)
-                    // Ajustamos la tensión de la curva en función de la distancia de la carga
                     let tension = 0.4 + (Math.abs(offset) / R) * 0.2;
                     let cpX = cx + (R * tension) * Math.cos(ang);
                     let cpY = cy + (R * tension) * Math.sin(ang);
@@ -102,3 +131,41 @@ if modulo_elegido == "⚡ Campo Electromagnético":
     </html>
     """
     components.html(html_electro_interactivo, height=550, scrolling=False)
+
+# --- SIMULACIÓN 2 ---
+elif modulo_elegido == "🌊 Tubo de Kundt (Ondas)":
+    st.write("Interfaz para visualización de ondas estacionarias y medición de nodos acústicos.")
+    
+    html_ondas = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body { background-color: #0b0c10; color: #66fcf1; font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+            .onda { width: 80%; height: 50px; background: repeating-linear-gradient(90deg, #0b0c10, #45a29e 20px, #0b0c10 40px); margin: 0 auto; border-radius: 25px;}
+        </style>
+    </head>
+    <body>
+        <h2>🌊 Entorno de Acústica</h2>
+        <div class="onda"></div>
+        <p>(Aquí incrustarás los controles del actuador y el micrófono)</p>
+    </body>
+    </html>
+    """
+    components.html(html_ondas, height=400, scrolling=True)
+
+# --- SIMULACIÓN 3 ---
+elif modulo_elegido == "☀️ Efecto Fotoeléctrico":
+    st.write("Análisis de emisión de electrones mediante excitación por fotones.")
+    
+    html_foto = """
+    <div style="background-color:#0b0c10; color:#c5c6c7; text-align:center; padding: 50px; border: 1px solid #66fcf1;">
+        <h3>☀️ Entorno Cuántico</h3>
+        <p>Espacio reservado para la simulación del efecto fotoeléctrico.</p>
+    </div>
+    """
+    components.html(html_foto, height=400, scrolling=True)
+
+# --- SIMULACIÓN VACÍA ---
+else:
+    st.info("Este módulo se encuentra actualmente en desarrollo. Vuelva pronto.")
