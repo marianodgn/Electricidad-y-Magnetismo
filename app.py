@@ -7,9 +7,44 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="Laboratorio de Física", page_icon="⚛️", layout="wide")
 
 # ==========================================
-# 2. Menú de Navegación Lateral
+# 2. SISTEMA DE AUTENTICACIÓN (La Puerta)
+# ==========================================
+def check_password():
+    if "autenticado" not in st.session_state:
+        st.session_state["autenticado"] = False
+
+    if not st.session_state["autenticado"]:
+        st.markdown("<h2 style='text-align: center; color: #66fcf1; margin-top: 50px;'>🔒 Acceso Restringido - Laboratorio Virtual</h2>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1,2,1])
+        with col2:
+            st.markdown("<div style='background: rgba(31, 40, 51, 0.8); padding: 20px; border-radius: 10px; border: 1px solid #45a29e;'>", unsafe_allow_html=True)
+            usuario = st.text_input("Usuario:")
+            clave = st.text_input("Contraseña:", type="password")
+            if st.button("INGRESAR AL LABORATORIO"):
+                if usuario == "EYMUNGS" and clave == "2026GUILLERMO":
+                    st.session_state["autenticado"] = True
+                    st.rerun()
+                else:
+                    st.error("🚫 Credenciales incorrectas. Verifique mayúsculas y vuelva a intentar.")
+            st.markdown("</div>", unsafe_allow_html=True)
+        return False
+    return True
+
+# Si la persona no está validada, el código se frena acá y no lee lo de abajo
+if not check_password():
+    st.stop()
+
+# ==========================================
+# 3. Menú de Navegación Lateral
 # ==========================================
 st.sidebar.title("🎛️ Panel de Control")
+
+# Botón para cerrar sesión por seguridad
+if st.sidebar.button("🚪 Cerrar Sesión"):
+    st.session_state["autenticado"] = False
+    st.rerun()
+    
+st.sidebar.markdown("---")
 st.sidebar.markdown("Seleccione el entorno virtual a ejecutar:")
 
 modulo_elegido = st.sidebar.radio(
@@ -23,7 +58,7 @@ modulo_elegido = st.sidebar.radio(
 )
 
 # ==========================================
-# 3. Lógica de renderizado principal
+# 4. Lógica de renderizado principal
 # ==========================================
 st.title(f"Laboratorio Virtual: {modulo_elegido}")
 st.markdown("---")
@@ -64,16 +99,14 @@ if modulo_elegido == "⚡ Campo Electromagnético":
             function dibujarEscena() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
-                // Obtenemos la posición desde el slider
                 let offset = parseFloat(slider.value);
                 let qx = cx + offset;
                 let qy = cy;
                 
-                // Actualizar la etiqueta del texto
                 let proporcion = (offset / R).toFixed(2);
                 valorPos.innerText = (proporcion >= 0 ? "+" : "") + proporcion + " R";
 
-                // 1. Dibujar líneas de campo exteriores (Invariantes)
+                // Líneas exteriores
                 ctx.lineWidth = 2;
                 ctx.strokeStyle = 'rgba(102, 252, 241, 0.7)'; 
                 for(let i=0; i<16; i++) {
@@ -84,15 +117,13 @@ if modulo_elegido == "⚡ Campo Electromagnético":
                     ctx.stroke();
                 }
 
-                // 2. Dibujar líneas de campo interiores (Dinámicas)
+                // Líneas interiores
                 ctx.strokeStyle = 'rgba(255, 70, 85, 0.8)';
                 for(let i=0; i<16; i++) {
                     let ang = i * (Math.PI / 8);
-                    
                     let endX = cx + R * Math.cos(ang);
                     let endY = cy + R * Math.sin(ang);
                     
-                    // Cálculo dinámico del punto de control para forzar incidencia normal (90 grados)
                     let tension = 0.4 + (Math.abs(offset) / R) * 0.2;
                     let cpX = cx + (R * tension) * Math.cos(ang);
                     let cpY = cy + (R * tension) * Math.sin(ang);
@@ -103,14 +134,14 @@ if modulo_elegido == "⚡ Campo Electromagnético":
                     ctx.stroke();
                 }
 
-                // 3. Cascarón conductor
+                // Cascarón
                 ctx.beginPath();
                 ctx.arc(cx, cy, R, 0, 2 * Math.PI);
                 ctx.lineWidth = 6;
                 ctx.strokeStyle = '#c5c6c7'; 
                 ctx.stroke();
 
-                // 4. Carga puntual +q móvil
+                // Carga +q
                 ctx.beginPath();
                 ctx.arc(qx, qy, 10, 0, 2 * Math.PI);
                 ctx.fillStyle = '#ff4655';
@@ -121,10 +152,7 @@ if modulo_elegido == "⚡ Campo Electromagnético":
                 ctx.fillText('+', qx - 5, qy + 5);
             }
 
-            // Escuchar cambios en el slider y redibujar al instante
             slider.addEventListener('input', dibujarEscena);
-            
-            // Dibujo inicial
             dibujarEscena();
         </script>
     </body>
